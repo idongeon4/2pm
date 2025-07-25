@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .image-container {
+            margin-bottom: 30px;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+        
+        .input-container {
+            margin-top: 20px;
+        }
+        
+        input[type="text"] {
+            background-color: #1a1a1a;
+            border: 2px solid #333;
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            width: 250px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #555;
+        }
+        
+        button {
+            background-color: #2a2a2a;
+            color: white;
+            border: 2px solid #333;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #3a3a3a;
+            border-color: #555;
+        }
+        
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            min-height: 25px;
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        @media (max-width: 600px) {
+            input[type="text"], button {
+                display: block;
+                margin: 10px auto;
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="https://i.postimg.cc/6q1cpdKz/img1753395694204.jpg" alt="Heritage Site" />
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="inputField" placeholder="What is this place?" />
+            <button onclick="checkAnswer()">Submit</button>
+        </div>
+        
+        <div class="message" id="resultMsg"></div>
+    </div>
+
+    <script>
+        // 암호화된 데이터
+        const data = {
+            url1: '647265616d792d646965666665',
+            url2: '6e6261636869612d3262366638',
+            url3: '64',
+            url4: '6e65746c6966792e617070',
+            ans1: ['416e676b6f72', '576174'],  // Angkor, Wat
+            ans2: 'ec9584eab384ecb98ced9598ed8ab8'  // 앙코르와트
+        };
+        
+        function hex2str(hex) {
+            let result = '';
+            for (let i = 0; i < hex.length; i += 2) {
+                result += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+            }
+            return result;
+        }
+        
+        function utf8hex2str(hex) {
+            let bytes = [];
+            for (let i = 0; i < hex.length; i += 2) {
+                bytes.push(parseInt(hex.substr(i, 2), 16));
+            }
+            return new TextDecoder().decode(new Uint8Array(bytes));
+        }
+        
+        function normalizeText(text) {
+            return text.toLowerCase().replace(/\s+/g, '').trim();
+        }
+        
+        function validateAnswer(input) {
+            const normalized = normalizeText(input);
+            const originalInput = input.toLowerCase().trim();
+            
+            // 영어 정답 체크
+            const eng1 = hex2str(data.ans1[0]);
+            const eng2 = hex2str(data.ans1[1]);
+            const engAnswers = [
+                (eng1 + eng2).toLowerCase(),
+                (eng1 + ' ' + eng2).toLowerCase()
+            ];
+            
+            if (engAnswers.includes(originalInput) || engAnswers.includes(normalized)) {
+                return true;
+            }
+            
+            // 한글 정답 체크
+            const koreanAnswers = [
+                '앙코르와트',
+                '앙코르 와트',
+                'angkorwat',
+                'angkor wat'
+            ];
+            
+            if (koreanAnswers.includes(originalInput) || koreanAnswers.includes(normalized)) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        function buildURL() {
+            const parts = [
+                hex2str(data.url1),
+                hex2str(data.url2), 
+                hex2str(data.url3),
+                hex2str(data.url4)
+            ];
+            return 'https://' + parts[0] + parts[1] + parts[2] + '.' + parts[3];
+        }
+        
+        function checkAnswer() {
+            const input = document.getElementById('inputField').value;
+            const msgDiv = document.getElementById('resultMsg');
+            
+            if (validateAnswer(input)) {
+                msgDiv.innerHTML = '';
+                setTimeout(() => {
+                    window.location.href = buildURL();
+                }, 500);
+            } else {
+                msgDiv.innerHTML = '<span class="error">Incorrect answer</span>';
+                setTimeout(() => {
+                    msgDiv.innerHTML = '';
+                }, 3000);
+            }
+            
+            document.getElementById('inputField').value = '';
+        }
+        
+        // Enter 키 지원
+        document.getElementById('inputField').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        // 기본 보안
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                (e.ctrlKey && e.key === 'u')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+        
+        // 메모리 정리
+        setTimeout(() => {
+            delete window.data;
+        }, 2000);
+    </script>
+</body>
+</html>
