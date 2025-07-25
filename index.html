@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .image-container {
+            margin-bottom: 30px;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+        
+        .input-container {
+            margin-top: 20px;
+        }
+        
+        input[type="text"] {
+            background-color: #1a1a1a;
+            border: 2px solid #333;
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            width: 250px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #555;
+        }
+        
+        button {
+            background-color: #2a2a2a;
+            color: white;
+            border: 2px solid #333;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #3a3a3a;
+            border-color: #555;
+        }
+        
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            min-height: 25px;
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        @media (max-width: 600px) {
+            input[type="text"], button {
+                display: block;
+                margin: 10px auto;
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="https://i.postimg.cc/6q1cpdKz/img1753395694204.jpg" alt="Heritage Site" />
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="inputField" placeholder="What is this place?" />
+            <button onclick="checkAnswer()">Submit</button>
+        </div>
+        
+        <div class="message" id="resultMsg"></div>
+    </div>
+
+    <script>
+        // 다중 암호화된 검증 데이터
+        const _0x2f4a = ['QW5na29yV2F0','QW5na29yIFdhdA==','7JWZ7L2U66a07JmA7Yq4','7JWZ7L2U66a0IOyVgO2KuA=='];
+        const _0x3b8c = {
+            a: [0x64, 0x72, 0x65, 0x61, 0x6d, 0x79, 0x2d, 0x64, 0x69, 0x65, 0x66, 0x66, 0x65],
+            b: [0x6e, 0x62, 0x61, 0x63, 0x68, 0x69, 0x61, 0x2d, 0x32, 0x62, 0x36, 0x66, 0x38, 0x64],
+            c: [0x2e, 0x6e, 0x65, 0x74, 0x6c, 0x69, 0x66, 0x79, 0x2e, 0x61, 0x70, 0x70]
+        };
+        
+        // 동적 함수 생성으로 디버깅 방해
+        const _fn = new Function('data', 'return String.fromCharCode.apply(null, data)');
+        const _decode = new Function('str', 'try{return atob(str)}catch(e){return null}');
+        
+        // 정답 검증 함수 (난독화)
+        function _validate(input) {
+            const clean = input.toLowerCase().replace(/\s+/g, '').trim();
+            const original = input.toLowerCase().trim();
+            
+            // Base64 디코딩으로 정답 확인
+            for (let i = 0; i < _0x2f4a.length; i++) {
+                const decoded = _decode(_0x2f4a[i]);
+                if (decoded && (decoded.toLowerCase() === original || decoded.toLowerCase().replace(/\s+/g, '') === clean)) {
+                    return true;
+                }
+            }
+            
+            // 추가 정답 패턴
+            const patterns = ['앙코르와트', '앙코르 와트', 'angkorwat', 'angkor wat'];
+            return patterns.some(p => p === original || p.replace(/\s+/g, '') === clean);
+        }
+        
+        // URL 재구성 함수
+        function _buildTarget() {
+            try {
+                const parts = [_fn(_0x3b8c.a), _fn(_0x3b8c.b), _fn(_0x3b8c.c)];
+                return 'https://' + parts[0] + parts[1] + parts[2];
+            } catch(e) {
+                return '#';
+            }
+        }
+        
+        // 정답 확인
+        function checkAnswer() {
+            const input = document.getElementById('inputField').value;
+            const msgDiv = document.getElementById('resultMsg');
+            
+            if (_validate(input)) {
+                msgDiv.innerHTML = '';
+                // 즉시 리다이렉트하지 않고 약간의 지연
+                const timer = setTimeout(() => {
+                    window.location.replace(_buildTarget());
+                }, Math.floor(Math.random() * 500) + 300);
+            } else {
+                msgDiv.innerHTML = '<span class="error">Incorrect answer</span>';
+                setTimeout(() => {
+                    msgDiv.innerHTML = '';
+                }, 3000);
+            }
+            
+            document.getElementById('inputField').value = '';
+        }
+        
+        // Enter 키 지원
+        document.getElementById('inputField').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        // 강화된 개발자 도구 차단
+        let devtools = {open: false, orientation: null};
+        let threshold = 160;
+        setInterval(() => {
+            if (window.outerHeight - window.innerHeight > threshold || 
+                window.outerWidth - window.innerWidth > threshold) {
+                if (!devtools.open) {
+                    devtools.open = true;
+                    document.body.innerHTML = '<div style="color:white;text-align:center;margin-top:50vh;">Access Denied</div>';
+                }
+            } else {
+                devtools.open = false;
+            }
+        }, 500);
+        
+        // 키보드 단축키 차단
+        document.addEventListener('keydown', function(e) {
+            // F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, Ctrl+S 차단
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C')) ||
+                (e.ctrlKey && (e.key === 'u' || e.key === 's'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        });
+        
+        // 우클릭, 선택, 드래그 방지
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
+        
+        // 콘솔 메시지 숨기기
+        if (typeof console !== 'undefined') {
+            console.log = console.warn = console.error = console.info = console.debug = () => {};
+        }
+        
+        // 전역 변수 정리
+        setTimeout(() => {
+            try {
+                delete window._0x2f4a;
+                delete window._0x3b8c;
+                delete window._fn;
+                delete window._decode;
+            } catch(e) {}
+        }, 1000);
+        
+        // 페이지 이탈 감지 및 히스토리 조작 방지
+        window.addEventListener('beforeunload', function(e) {
+            e.returnValue = '';
+        });
+        
+        // 추가 보안: 스크립트 태그 동적 삽입 방지
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.tagName === 'SCRIPT') {
+                        node.remove();
+                    }
+                });
+            });
+        });
+        observer.observe(document, { childList: true, subtree: true });
+    </script>
+</body>
+</html>
